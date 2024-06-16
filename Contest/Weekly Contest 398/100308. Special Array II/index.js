@@ -4,27 +4,27 @@
  * @return {boolean[]}
  */
 var isArraySpecial = function (nums, queries) {
-  const n = nums.length;
-  const lastSameParity = new Array(n).fill(-1);
-  for (let i = 1; i < n; i++) {
-    if (nums[i - 1] % 2 === nums[i] % 2) {
-      lastSameParity[i] = i - 1;
-    } else if (i > 1 && lastSameParity[i - 1] !== -1) {
-      lastSameParity[i] = lastSameParity[i - 1];
+  let answer = new Array(queries.length).fill(true);
+  let hash = new Map();
+
+  for (let i = 0; i < nums.length; i++) {
+    if (nums[i] % 2 === nums[i + 1] % 2) {
+      hash.set([nums[i], nums[i + 1]], false);
+    } else hash.set([nums[i], nums[i + 1]], true);
+  }
+
+  for (let i = 0; i < nums.length - 1; i++) {
+    if (!hash.get([nums[i], nums[i + 1]])) {
+      console.log(nums[i], nums[i + 1]);
+      for (let j = 0; j < queries.length; j++) {
+        if (queries[j][0] <= i <= queries[j][1]) {
+          answer[j] = false;
+        }
+      }
     }
   }
 
-  let results = [];
-  for (let [from, to] of queries) {
-    if (from === to) {
-      results.push(true);
-    } else {
-      let invalidIndex = lastSameParity[to];
-      results.push(invalidIndex < from);
-    }
-  }
-
-  return results;
+  return !answer.length ? [true] : answer;
 };
 
 /// [4,3,1] -> 4외 1이 둘다 짝수이거나 홀수여야 true
